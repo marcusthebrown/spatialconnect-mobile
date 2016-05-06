@@ -10,9 +10,9 @@
     "react-native": "^0.24.1",
     "react-native-slider": "^0.5.3",
     "rx": "^4.1.0",
+    "spatialconnect": "file:///Users/mcenac/projects/spatialconnect-js",
     "tcomb-form-native": "^0.4.2",
-    "tcomb-json-schema": "^0.2.5",
-    "spatialconnect": "frankrowe/spatialconnect-js#no-build"
+    "tcomb-json-schema": "^0.2.5"
   },
   "devDependencies": {
     "eslint": "^2.7.0",

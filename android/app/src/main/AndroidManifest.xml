@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.scmobile"
+    package="com.boundlessgeo.scmobile"
     android:versionCode="1"
     android:versionName="1.0">
 
@@ -14,7 +14,8 @@
       android:allowBackup="true"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
-      android:theme="@style/AppTheme">
+      android:theme="@style/AppTheme"
+      android:name="android.support.multidex.MultiDexApplication">
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
