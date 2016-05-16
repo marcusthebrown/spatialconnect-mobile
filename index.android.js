@@ -9,7 +9,7 @@ import React, {
   NativeModules,
   DeviceEventEmitter
 } from 'react-native';
-import sc from 'spatialconnect';
+import * as sc from 'spatialconnect';
 
 class SCMobile extends Component {
 
@@ -34,50 +34,49 @@ class SCMobile extends Component {
   }
 
   componentDidMount() {
-    // TODO: fix spatialconnect-js so you can subscribe to the actions
-    sc.stream.lastKnownLocation.subscribe(data => {
+    console.log(sc);
+    sc.startAllServices();
+    sc.loadDefaultConfigs();
+
+    sc.lastKnownLocation().subscribe(data => {
       console.log('received location', data);
     });
-    sc.action.enableGPS();
 
-    // TODO: fix spatialconnect-js so you can subscribe to the actions
-    sc.stream.stores.subscribe(data => {
+    sc.stores().subscribe(data => {
       console.log('received stores', data);
       this.setState({
         stores: data.stores
       });
     });
-    sc.action.stores();
 
-    // TODO: fix spatialconnect-js so you can subscribe to the actions
-    sc.stream.store.subscribe(data => {
+    sc.store('a5d93796-5026-46f7-a2ff-e5dec85heh6b').subscribe(data => {
       console.log('received store by id', data);
     });
-    sc.action.store('a5d93796-5026-46f7-a2ff-e5dec85heh6b');
 
+    var filter = sc.geoBBOXContains([-180, -90, 180, 90]);
+    sc.geospatialQuery(filter)
+    .first()
+    .subscribe(data => console.log('received feature from query', JSON.parse(data)));
+    sc.geospatialQuery(filter)
+    .takeUntil(Rx.Observable.timer(5000))
+    .count()
+    .subscribe(data => console.log('number of features returned', data));
 
-    // TODO: fix spatialconnect-js so you can subscribe to the actions
-    sc.stream.spatialQuery.first().subscribe((data) => {
-      console.log('received feature from query', JSON.parse(data));
-      // console.log('received feature from query', data);
-    });
-    var f = sc.Filter().geoBBOXContains([-180, -90, 180, 90]);
-    sc.action.geospatialQuery(f)
-
-    // TODO: fix spatialconnect-js so you can subscribe to the actions
-    sc.stream.createFeature.subscribe((data) => {
-      console.log('received newly created feature', JSON.parse(data));
-    });
     var geojson = {
       "type" : "Feature",
       "geometry" : { "type" : "Point", "coordinates" : [ -72.9813210022207, 18.4274079607845 ] },
       "properties" : { "cpyrt_note" : "http://www.copyright.gov/" }
     };
     // TODO: create feature action shouldn't need the store id and layer b/c it
-    // should be in the SCKeyTuple that's part of the feature's id property
+    // should be in the SCKeyTuple that's part of the feature's id or key property
     // TODO: document that it's easier to send geojson strings instead of objects
-    sc.action.createFeature(JSON.stringify(geojson), 'a5d93796-5026-46f7-a2ff-e5dec85heh6b', 'point_features');
-
+    sc.createFeature(
+      JSON.stringify(geojson),
+      'a5d93796-5026-46f7-a2ff-e5dec85heh6b',
+      'point_features'
+    ).subscribe((data) => {
+      console.log('received newly created feature', JSON.parse(data));
+    });
 
     var geojsonUpdate = {
       "type" : "Feature",
@@ -85,9 +84,8 @@ class SCMobile extends Component {
       "properties" : { "cpyrt_note" : "updated" },
       "id": "YTVkOTM3OTYtNTAyNi00NmY3LWEyZmYtZTVkZWM4NWhlaDZi↵.cG9pbnRfZmVhdHVyZXM=↵.MTAwMQ==↵"
     };
-    sc.action.updateFeature(JSON.stringify(geojsonUpdate));
-    sc.action.deleteFeature("YTVkOTM3OTYtNTAyNi00NmY3LWEyZmYtZTVkZWM4NWhlaDZi↵.cG9pbnRfZmVhdHVyZXM=↵.MTAwMQ==↵");
-
+    sc.updateFeature(JSON.stringify(geojsonUpdate));
+    sc.deleteFeature("YTVkOTM3OTYtNTAyNi00NmY3LWEyZmYtZTVkZWM4NWhlaDZi↵.cG9pbnRfZmVhdHVyZXM=↵.MTAwMQ==↵");
   }
 
 }
