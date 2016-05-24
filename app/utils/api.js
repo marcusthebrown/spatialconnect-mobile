@@ -1,8 +1,7 @@
 /*global fetch*/
 import * as sc from 'spatialconnect/native';
-//const API_URL = 'http://localhost:3456/';
-//const API_URL = 'http://localhost:3000/api/';
 const API_URL = 'http://localhost:8085/';
+
 let api = {
   getFormData() {
     return fetch(API_URL + 'formData')
