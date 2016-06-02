@@ -13,15 +13,15 @@ import palette from '../style/palette';
 class FormData extends Component {
   render() {
     let fields = [];
-    for (var key in this.props.form.data) {
-      fields.push(<Text key={key}>{key}: {this.props.form.data[key]}</Text>);
+    for (var key in this.props.form.fields) {
+      fields.push(<Text key={key}>{key}: {this.props.form.fields[key]}</Text>);
     }
     let location = this.props.form.location ?
       <Text>Location Submitted: {this.props.form.location.lat}, {this.props.form.location.lon}</Text> :
       <View/>;
     return (
       <View style={styles.container}>
-        <Text>Form ID: {this.props.form.formID}</Text>
+        <Text>Form ID: {this.props.form.id}</Text>
         {location}
         {fields}
       </View>

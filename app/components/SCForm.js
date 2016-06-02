@@ -12,7 +12,8 @@ import tcomb from 'tcomb-form-native';
 import api from '../utils/api';
 import palette from '../style/palette';
 import scformschema from 'spatialconnect-form-schema/native';
-import { lastKnownLocation } from 'spatialconnect/native';
+import * as sc from 'spatialconnect/native';
+import * as _ from 'lodash';
 
 tcomb.form.Form.i18n = {
   optional: '',
@@ -44,16 +45,16 @@ class SCForm extends Component {
   }
 
   saveForm(formData) {
-    api.saveForm(this.props.formInfo, this.state.location, formData)
-      // .then(() => {
-      //   this.props.navigator.push({
-      //     title: '',
-      //     component: FormSuccess
-      //   });
-      // })
-      // .catch(() => {
-      //   //TODO handle error submitting form
-      // });
+    console.log('saving form with value ', formData);
+
+    let layerId = this.props.formInfo.name.toLowerCase().replace(/ /g,'_');
+    let newFeature = sc.spatialFeature('DEFAULT_STORE', layerId, formData);
+
+    //todo: add location to feature if available
+    console.log('submitting new feature ', newFeature.serialize());
+    sc.createFeature(newFeature.serialize()).subscribe((data) => {
+      console.log('received newly created feature', JSON.parse(data));
+    });
   }
 
   onPress () {
@@ -64,12 +65,16 @@ class SCForm extends Component {
   }
 
   componentWillMount() {
-    this.lastKnown = lastKnownLocation();
-    this.lastKnown.subscribe(data => {
+    sc.lastKnownLocation().subscribe(data => {
       console.log(data);
       this.setState({location: data});
     });
+
+
+    console.log('formInfo ', JSON.stringify(this.props.formInfo));
     let { schema, options } = scformschema.translate(this.props.formInfo);
+    console.log('schema ', JSON.stringify(schema));
+    console.log('options ', JSON.stringify(options));
     let initialValues = {};
 
     for (let prop in schema.properties) {
@@ -83,7 +88,7 @@ class SCForm extends Component {
   }
 
   componentWillUnmount() {
-    //this.lastKnown.dispose();
+    //TODO: terminate the subscriptions
   }
 
   onChange(value) {
@@ -117,7 +122,7 @@ class SCForm extends Component {
 
 SCForm.propTypes = {
   formInfo: PropTypes.object.isRequired,
-  navigator: PropTypes.object.isRequired
+  //navigator: PropTypes.object.isRequired
 };
 
 var styles = StyleSheet.create({
